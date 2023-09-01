@@ -42,10 +42,115 @@ const playerContoroller = function() {
     }
 }();
 
-const gameController = function() {
+const gameOver = function() {
+    activePlayer = playerContoroller.getActivePlayer();
+    let values = {};
+
+    const allEqualHorizontal = arr => arr.every(val => val === arr[0]);
+    const allEqualVertical = arr => { 
+        if ((arr[0][0] == arr[1][0] && arr[1][0] == arr[2][0]) && (arr[0][0] !== 0 && arr[1][0] !== 0 && arr[2][0] !== 0)) {
+            if(arr[0][0] == 'X') {
+                letter = 'X';
+            } else {
+                letter = 'Y';
+            }
+            values = {
+                boolean: true,
+                letter
+            }
+        } 
+        if ((arr[0][1] == arr[1][1] && arr[1][1] == arr[2][1]) && (arr[0][1] !== 0 && arr[1][1] !== 0 && arr[2][1] !== 0)) {
+            if(arr[0][1] == 'X') {
+                letter = 'X';
+            } else {
+                letter = 'Y';
+            }
+            values = {
+                boolean: true,
+                letter
+            }
+        }
+        if ((arr[0][2] == arr[1][2] && arr[1][2] == arr[2][2]) && (arr[0][2] !== 0 && arr[1][2] !== 0 && arr[2][2] !== 0)) {
+            if(arr[0][2] == 'X') {
+                letter = 'X';
+            } else {
+                letter = 'Y';
+            }
+            values = {
+                boolean: true,
+                letter
+            }
+        }
+    }
+    const allEqualDiagonal = arr => {
+        if ((arr[0][0] == arr[1][1] && arr[1][1] == arr[2][2]) && (arr[0][0] !== 0 && arr[1][1] !== 0 && arr[2][2] !== 0)) {
+            if(arr[0][0] == 'X') {
+                letter = 'X';
+            } else {
+                letter = 'Y';
+            }
+            values = {
+                boolean: true,
+                letter
+            }
+        } 
+        if ((arr[0][2] == arr[1][1] && arr[1][1] == arr[2][0]) && (arr[0][2] !== 0 && arr[1][1] !== 0 && arr[2][0] !== 0)) {
+            if(arr[0][1] == 'X') {
+                letter = 'X';
+            } else {
+                letter = 'Y';
+            }
+            values = {
+                boolean: true,
+                letter
+            }
+        }
+    }
+
+    const everyValueIsEqual = () => {
+        for (let i = 0; i < 3; i++) {
+            if (allEqualHorizontal(currentBoard[i])) {
+                if (currentBoard[i][0] === 'X') {
+                    values = {
+                        boolean: true,
+                        letter: 'X'
+                    }
+                } else if (currentBoard[i][0] === 'Y') {
+                    values = {
+                        boolean: true,
+                        letter: 'Y'
+                    }
+                }
+            }
+        }
+        allEqualVertical(currentBoard);
+        allEqualDiagonal(currentBoard);
+    }
+
+    const getValues = () => values;
+
+    const winner = () => {
+        if(values.boolean) {
+            if (values.letter === 'X') {
+                console.log('PlayerX has won');
+            } else if (values.letter === 'Y') {
+                console.log('PlayerY has won');
+            }
+        }
+    };
+
+    return {
+        everyValueIsEqual,
+        getValues,
+        winner
+    }
+}();
+
+const gameController = function() {   
+    currentBoard = board.getBoard();
+    chooseCellButton = document.createElement('button');
+    chooseCellButton.innerHTML = 'Choose Cell'; 
     const cellButtton = function() {
-        chooseCellButton = document.createElement('button');
-        chooseCellButton.innerHTML = 'Choose Cell';
         document.body.appendChild(chooseCellButton);
         chooseCellButton.onclick = () => {
             const row = prompt('enter row');
@@ -61,8 +166,13 @@ const gameController = function() {
 
     const playRound = (row, column) => {
         board.getBoard()[row][column] = playerContoroller.getActivePlayer().value;
-        playerContoroller.switchPlayerTurn();
-        renderBoard();
+        gameOver.everyValueIsEqual();
+        if(gameOver.getValues().boolean) {
+            gameOver.winner();
+        } else {
+            playerContoroller.switchPlayerTurn();
+            renderBoard();
+        }
     }
 
     return {
@@ -73,5 +183,6 @@ const gameController = function() {
 
 gameController.renderBoard();
 gameController.cellButtton();
+
 
 
