@@ -1,8 +1,21 @@
-buttons = document.querySelectorAll('button');
+let buttons = document.querySelectorAll('button');
+let restart = document.createElement('button')
+let winnerP = document.createElement('p');
+
+let gameover = false;
 
 const board = function() {
     const blocks = 3;
     let board = [];
+
+    const generateBoard = function() {
+        for (let i = 0; i < 3; i++) {
+            board[i] = [];
+            for (let j = 0; j < 3; j++) {
+                board[i].push(0);
+            }
+        }
+    }
 
     for (let i = 0; i < 3; i++) {
         board[i] = [];
@@ -14,6 +27,7 @@ const board = function() {
     const getBoard = () => board;
 
     return {
+        generateBoard,
         getBoard
     }
 }()
@@ -43,6 +57,23 @@ const playerContoroller = function() {
         switchPlayerTurn
     }
 }();
+
+function restartButton() {
+    document.body.appendChild(restart);
+    restart.innerHTML = 'Restart';
+    restart.addEventListener('click', () => {
+        board.generateBoard();
+        gameController.renderBoard();
+        buttons.forEach(button => {
+            button.innerHTML = null;
+        })
+        if (document.body.firstChild()) {
+            document.body.removeChild(winnerP);
+            document.body.removeChild(restart);
+        }
+        gameover = false;
+    })
+}
 
 const gameOver = function() {
     activePlayer = playerContoroller.getActivePlayer();
@@ -134,9 +165,19 @@ const gameOver = function() {
     const winner = () => {
         if(values.boolean) {
             if (values.letter === 'X') {
+                document.body.appendChild(winnerP);
+                winnerP.innerHTML = 'PlayerX has won';
                 console.log('PlayerX has won');
+                restartButton();
+                values = {};
+                gameover = true;
             } else if (values.letter === 'Y') {
+                document.body.appendChild(winnerP);
+                winnerP.innerHTML = 'PlayerY has won';
                 console.log('PlayerY has won');
+                restartButton();
+                values = {};
+                gameover = true;
             }
         }
     };
@@ -157,7 +198,7 @@ const gameController = function() {
     }
 
     const playRound = (row, column, id) => {
-        if (document.getElementById(id).innerHTML !== 'X' && document.getElementById(id).innerHTML !== 'Y') {
+        if (document.getElementById(id).innerHTML !== 'X' && document.getElementById(id).innerHTML !== 'Y' && !gameover) {
             board.getBoard()[row][column] = playerContoroller.getActivePlayer().value;
             document.getElementById(id).innerHTML = playerContoroller.getActivePlayer().value;
             gameOver.everyValueIsEqual();
