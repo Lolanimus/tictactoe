@@ -1,3 +1,5 @@
+buttons = document.querySelectorAll('button');
+
 const board = function() {
     const blocks = 3;
     let board = [];
@@ -148,41 +150,41 @@ const gameOver = function() {
 
 const gameController = function() {   
     currentBoard = board.getBoard();
-    chooseCellButton = document.createElement('button');
-    chooseCellButton.innerHTML = 'Choose Cell'; 
-    const cellButtton = function() {
-        document.body.appendChild(chooseCellButton);
-        chooseCellButton.onclick = () => {
-            const row = prompt('enter row');
-            const column = prompt('enter col');
-            playRound(row, column);
-        }
-    }
 
     const renderBoard = () => {
         console.log(board.getBoard());
         console.log(`${playerContoroller.getActivePlayer().name}'s turn`);
     }
 
-    const playRound = (row, column) => {
-        board.getBoard()[row][column] = playerContoroller.getActivePlayer().value;
-        gameOver.everyValueIsEqual();
-        if(gameOver.getValues().boolean) {
-            gameOver.winner();
-        } else {
-            playerContoroller.switchPlayerTurn();
-            renderBoard();
+    const playRound = (row, column, id) => {
+        if (document.getElementById(id).innerHTML !== 'X' && document.getElementById(id).innerHTML !== 'Y') {
+            board.getBoard()[row][column] = playerContoroller.getActivePlayer().value;
+            document.getElementById(id).innerHTML = playerContoroller.getActivePlayer().value;
+            gameOver.everyValueIsEqual();
+            if(gameOver.getValues().boolean) {
+                gameOver.winner();
+            } else {
+                playerContoroller.switchPlayerTurn();
+                renderBoard();
+            }
         }
     }
 
     return {
-        cellButtton,
+        playRound,
         renderBoard
     }
 }();
 
+buttons.forEach(button => {
+    button.addEventListener('click', () => {
+        let row = button.id.charAt(0);
+        let column = button.id.charAt(1);
+        gameController.playRound(row, column, button.id);
+    })
+});
+
 gameController.renderBoard();
-gameController.cellButtton();
 
 
 
